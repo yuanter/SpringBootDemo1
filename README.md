@@ -23,12 +23,12 @@ wget https://ghproxy.com/https://raw.githubusercontent.com/yuanter/SpringBootDem
 ```javascript
 vi curlSH.sh
 ```
-参数说明
-    * ip：为您部署的服务器ip  
-    * 手机号码：替换为您的小米运动APP账号，一定要绑定手机号码，使用手机  
-    * 密码：替换为您的小米运动APP密码  
-    * 范围步数和起始步数：随机打卡步数范围=起始步数+范围步数-1.如打卡范围是20000-22222，则起始步数为20000，范围步数为2223，即最大步数为20000+2223-1=222222  
-    * 例如我修改的部分
+参数说明  
+* ip：为您部署的服务器ip  
+* 手机号码：替换为您的小米运动APP账号，一定要绑定手机号码，使用手机  
+* 密码：替换为您的小米运动APP密码  
+* 范围步数和起始步数：随机打卡步数范围=起始步数+范围步数-1.如打卡范围是20000-22222，则起始步数为20000，范围步数为2223，即最大步数为20000+2223-1=222222  
+* 例如我修改的部分
 ```javascript
 curl http://119.29.xxx.xxx:8080/mi?phoneNumber=131xxxxxxx\&password=xxxxxxxx\&steps=$[$[RANDOM%22223]+20000]
 ```
@@ -62,3 +62,4 @@ curl http://119.29.xxx.xxx:8080/mi?phoneNumber=131xxxxxxx\&password=xxxxxxxx\&st
     ```javascript
     */1 * * * *  
     ```
+    
