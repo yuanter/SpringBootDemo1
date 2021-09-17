@@ -38,12 +38,11 @@ curl http://119.29.xxx.xxx:8080/mi?phoneNumber=131xxxxxxx\&password=xxxxxxxx\&st
 	```javascript
     which crontab
     ```
-	* 2、如果未安装，则先安装，否之跳过该步骤
+	* 2、如果未安装，则先安装，否之跳过该步骤    （PS：Ubuntu操作系统下请使用apt-get）
     ```javascript
 	yum install vixie-cron
     yum install crontabs
     ```
-    （PS：Ubuntu操作系统下请使用apt-get）
 	* 3、创建定时任务  
 	```javascript
     sudo vi  /etc/crontab
