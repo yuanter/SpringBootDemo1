@@ -4,7 +4,7 @@
 docker pull yuanter/demo:latest
 ```
 
-* 2、运行demo（#8080:8080中第一个8080是自定义映射端口，自己可以随意改）
+* 2、运行demo（#8080:8080中第一个8080是自定义映射端口，自己可以随意改，记得开放端口）
 ```javascript
 docker run -d --restart=always --name demo -p 8080:8080 yuanter/demo 
 ```
@@ -30,7 +30,7 @@ vi curlSH.sh
 * 范围步数和起始步数：随机打卡步数范围=起始步数+范围步数-1.如打卡范围是20000-22222，则起始步数为20000，范围步数为2223，即最大步数为20000+2223-1=222222  
 * 例如我修改的部分
 ```javascript
-curl http://119.29.xxx.xxx:8080/mi?phoneNumber=131xxxxxxx\&password=xxxxxxxx\&steps=$[$[RANDOM%22223]+20000]
+curl http://119.29.xxx.xxx:8080/mi?phoneNumber=131xxxxxxx\&password=xxxxxxxx\&steps=$[$[RANDOM%2223]+20000]
 ```
 
 * 6、开启定时任务
@@ -47,7 +47,7 @@ curl http://119.29.xxx.xxx:8080/mi?phoneNumber=131xxxxxxx\&password=xxxxxxxx\&st
 	```javascript
     sudo vi  /etc/crontab
     ```
-	* 4、在编辑框按i添加以下定时任务（我设置为晚上18、20、22三个小时，同步三次）
+	* 4、在编辑框按i添加以下定时任务（我设置为晚上18、20、22三个小时，同步三次。晚上12点至上午10点前不同步）
 	corn表达式 用户名 脚本路径
     ```javascript
 	0 18,20,22 * * * root /root/curlSH.sh
@@ -57,7 +57,7 @@ curl http://119.29.xxx.xxx:8080/mi?phoneNumber=131xxxxxxx\&password=xxxxxxxx\&st
     ```javascript
 	service crond start
     ```
-* 7、做测试时，可以用这个表达式，表示1分钟执行一次任务
+* 7、做测试时，可以用这个表达式，表示1分钟执行一次任务，后续完毕再改回来
     ```javascript
     */1 * * * *  
     ```
