@@ -52,7 +52,7 @@ curl http://119.29.xxx.xxx:8080/mi?phoneNumber=131xxxxxxx\&password=xxxxxxxx\&st
     ```javascript
 	0 18,20,22 * * * root /root/curlSH.sh
     ```
-	* 5、按ESC，接着输入字符***:wq***保存
+	* 5、按ESC，接着输入字符 ***:wq***保存
 	* 6、开启crontab服务 
     ```javascript
 	service crond start
