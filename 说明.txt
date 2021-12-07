@@ -1,0 +1,2 @@
+SpringBootDemo1-1.0-SNAPSHOT.jar这个是打包出来的包，只需要有jdk环境即可运行，如何配置jdk和运行jar，可自行百度。
+其他部分是源码，其中Http.java是小米运动的接口，其他的是我练习SpringBoot项目随便写的方法。
