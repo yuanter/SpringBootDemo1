@@ -8,5 +8,6 @@ public class MySpringBootDemo {
     public static void main(String[] args) {
         //入口
         SpringApplication.run(MySpringBootDemo.class,args);
+        System.out.println("http://127.0.0.1:8080");
     }
 }
