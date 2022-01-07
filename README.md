@@ -1,11 +1,11 @@
-###小米运动刷步数，可同步支付宝运动+微信运动
-##使用教程
+### 小米运动刷步数，可同步支付宝运动+微信运动
+## 使用教程
 1.先下载小米运动APP。使用手机号码注册，在APP中，在设置里找到第三方接入，绑定微信和支付宝（需要使用哪个就绑定哪个，QQ绑定不起作用）  
 2.打开```javascript http://ip:8080 ```网站，提交手机号码和密码，以及步数，点击打卡按钮即可提交步数  
 
 
 
-##关于源码和curlSH.sh一起使用，为linux服务器定时器
+## 关于源码和curlSH.sh一起使用，为linux服务器定时器
 * 1、直接docker下载
 ```javascript
 docker pull yuanter/demo:latest
@@ -70,7 +70,7 @@ curl http://119.29.xxx.xxx:8080/mi?phoneNumber=131xxxxxxx\&password=xxxxxxxx\&st
     ```
     
     
-###常见问题
+### 常见问题
 * Q:我的账号安全吗？  
 * A:本站不保存任何形式的密码。  
 * Q:这个程序是干嘛的？  
