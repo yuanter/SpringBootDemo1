@@ -1,2 +1,1 @@
-SpringBootDemo1-1.0-SNAPSHOT.jarÕâ¸öÊÇ´ò°ü³öÀ´µÄ°ü£¬Ö»ÐèÒªÓÐjdk»·¾³¼´¿ÉÔËÐÐ£¬ÈçºÎÅäÖÃjdkºÍÔËÐÐjar£¬¿É×ÔÐÐ°Ù¶È¡£
-ÆäËû²¿·ÖÊÇÔ´Âë£¬ÆäÖÐHttp.javaÊÇÐ¡Ã×ÔË¶¯µÄ½Ó¿Ú£¬ÆäËûµÄÊÇÎÒÁ·Ï°SpringBootÏîÄ¿Ëæ±ãÐ´µÄ·½·¨¡£
+demo-latest.jarè¿™ä¸ªæ˜¯æ‰“åŒ…å‡ºæ¥çš„åŒ…ï¼Œåªéœ€è¦æœ‰jdkçŽ¯å¢ƒå³å¯è¿è¡Œï¼Œå¦‚ä½•é…ç½®jdkå’Œè¿è¡Œjarï¼Œå¯è‡ªè¡Œç™¾åº¦ã€‚

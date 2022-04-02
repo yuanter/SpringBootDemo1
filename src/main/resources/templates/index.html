@@ -12,6 +12,15 @@
   <link href="../css/bootstrap.min.css" rel="stylesheet" />
   <script src="../js/jquery-3.4.1.js"></script>
   <script src="../js/bootstrap.min.js"></script>
+  <script src="../js/clipboard.min.js"></script>
+  <script src="../js/messenger.js"></script>
+  <link href="../css/messenger.css" rel="stylesheet" />
+  <link href="../css/messenger-theme-future.css" rel="stylesheet" />
+  <script type="text/javascript">
+   $._messengerDefaults = {
+    extraClasses: 'messenger-fixed messenger-theme-future messenger-on-bottom messenger-on-right'
+   }
+  </script>
  </head>
  <body> 
   <div class="container"> 
@@ -26,7 +35,10 @@
         <a data-toggle="modal" data-target="#qa">常见问题</a> 
        </div> 
        <div id="load" class="alert alert-info" style="display:none;"></div> 
-       <div id="login" class="list-group-item"> 
+       <div id="login" class="list-group-item">
+        <div class="form-group" id="tipId" style="display: none">
+               <div class="alert alert-success" id="tipData">Tip：当启用账号保存功能时，将保存当前账号☞服务器上，并启用定时打卡功能</div>
+           </div>
         <div class="form-group"> 
          <div class="input-group">
           <div class="input-group-addon">手机号</div> 
@@ -39,14 +51,46 @@
           <input type="password" id="pwd" value="" class="form-control" onkeydown="if(event.keyCode==13){submit.click()}" />
          </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="stepsDiv">
          <div class="input-group">
           <div class="input-group-addon">步数</div>
-          <input type="text" id="steps" value="" class="form-control" onkeydown="if(event.keyCode==13){submit.click()}" />
+          <input type="text" id="steps" value="" class="form-control" onkeydown="if(event.keyCode==13){submit.click()}"/>
+         </div>
+        </div>
+        <div class="form-group" id="minStepsDiv"  style="display: none">
+               <div class="input-group">
+                   <div class="input-group-addon">最小步数</div>
+                   <input type="text" id="minSteps" value="" class="form-control" onkeydown="if(event.keyCode==13){submit.click()}" placeholder="最小步数为1" />
+               </div>
+           </div>
+        <div class="form-group" id="maxStepsDiv"  style="display: none">
+               <div class="input-group">
+                   <div class="input-group-addon">最大步数</div>
+                   <input type="text" id="maxSteps" value="" class="form-control" onkeydown="if(event.keyCode==13){submit.click()}" placeholder="最大步数为100000" />
+               </div>
+           </div>
+
+        <div class="form-group" id="isShowDiv"  style="display: none">
+         <div class="input-group">
+          <div class="input-group-addon">
+           <div class="btn-group">
+            <div class="btn-group" id="btn-group">
+             <button data-toggle="dropdown" class="btn btn-primary btn-block" id="isSaveBt">是否启用账号保存功能，默认不保存<span class="caret"></span></button>
+             <ul class="dropdown-menu" id="isSaveUl">
+              <li id="saveLi">
+               <a data-target="#" id="save" onclick="isSave(1)">启用</a>
+              </li>
+              <li id="noSaveLi">
+               <a data-target="#" id="noSave" onclick="isSave(0)">不启用</a>
+              </li>
+             </ul>
+            </div>
+           </div>
+          </div>
          </div>
         </div>
         <button type="button" id="submit" class="btn btn-primary btn-block">打卡</button>
-        <br /> 
+        <br />
        </div> 
       </div> 
       <p class="bg-info " style="padding: 10px; font-size: 90%; ">1.先下载小米运动APP。使用手机号码注册，在APP中，在设置里找到第三方接入，绑定微信和支付宝（需要使用哪个就绑定哪个，QQ绑定不起作用）</p>
