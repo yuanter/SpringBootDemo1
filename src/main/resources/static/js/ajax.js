@@ -14,15 +14,20 @@ function onloadIsShow() {
             //$('#submit').hide();
             if(data.code==0){
                 if (data.data) {
-                    //启用tip
-                    $("#tipId").show();
-                    //修改tip
-                    $("#tipData").html(data.data.tip);
-
-                    //启用是否打开功能
-                    $("#isShowDiv").show();
+                    if (data.data.flag == "true" || data.data.flag){
+                        //启用tip
+                        $("#tipId").show();
+                        //修改tip
+                        $("#tipData").html(data.data.tip);
+                        //启用是否打开功能
+                        $("#isShowDiv").show();
+                    }else {
+                        //启用tip
+                        $("#tipId").hide();
+                        //启用是否打开功能
+                        $("#isShowDiv").hide();
+                    }
                 }
-
             }else if(data.code == -1){
                 $.globalMessenger().post({
                     message: data.msg,//提示信息

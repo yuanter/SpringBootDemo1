@@ -55,6 +55,7 @@ public class Http {
     */
     @GetMapping("isShow")
     public R<JSONObject> isShow() throws Exception {
+        System.out.println(isSave);
         //默认启动
         Boolean flag = true;
         //为空则说明不开启
