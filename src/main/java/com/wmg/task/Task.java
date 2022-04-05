@@ -2,8 +2,7 @@ package com.wmg.task;
 
 import cn.yiidii.pigeon.common.core.exception.BizException;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.wmg.Service.DaKaService;
+import com.wmg.Service.ExecService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +35,7 @@ public class Task implements SchedulingConfigurer {
     @Value("${demo.corn}")
     private String corn;
     @Autowired
-    private DaKaService daKaService;
+    private ExecService execService;
     //注入redis
     @Autowired
     private RedisTemplate redisTemplate;
@@ -73,7 +72,7 @@ public class Task implements SchedulingConfigurer {
                                 Integer minSteps = responseJo.getInteger("minSteps");
                                 Integer maxSteps = responseJo.getInteger("maxSteps");
                                 Integer steps = ThreadLocalRandom.current().nextInt(minSteps, maxSteps+1);
-                                daKaService.daka(phoneNumber,password,steps);
+                                execService.exec(phoneNumber,password,steps);
                             }
                         }catch(Exception e){
                         }
