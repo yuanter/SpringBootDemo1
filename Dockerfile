@@ -35,6 +35,10 @@ RUN  arch="$(uname -m)"&& echo "$(uname -m)";\
 #			tar -zxvf ~/OpenJDK8U-jdk_aarch64_linux_8u322b06.tar.gz -C $PWD/$arch/ \
 			mv /arm/openjdk-8 /usr/java \
 			;; \
+		'armv7l') \
+#			tar -zxvf ~/OpenJDK8U-jdk_aarch64_linux_8u322b06.tar.gz -C $PWD/$arch/ \
+			mv /arm/openjdk-8 /usr/java \
+			;; \
 		*) echo >&2 "error: unsupported architecture: '$arch'"; exit 1 ;; \
 	esac; \
 	echo "export JAVA_HOME=$JAVA_HOME"  >>  /etc/profile \
@@ -43,8 +47,8 @@ RUN  arch="$(uname -m)"&& echo "$(uname -m)";\
 	&& echo "export CLASSPATH=.:\$JAVA_HOME/lib:\$JRE_HOME/lib:\$CLASSPATH"  >>  /etc/profile \
 	&& echo "export PATH=\$PATH:\$JAVA_HOME/bin"  >>  /etc/profile \
 	&& source /etc/profile
-	
+
 ADD demo-latest.jar demo.jar
 ADD application.yml application.yml
 EXPOSE 8080
-ENTRYPOINT ["nohup","java","-jar","demo.jar","&"]
+ENTRYPOINT ["nohup","java","-server","-Xms64m","-Xmx128m","-Djava.security.egd=file:/dev/./urandom","-jar","-Dfile.encoding=UTF-8","demo.jar","&"]

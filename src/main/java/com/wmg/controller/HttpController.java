@@ -127,7 +127,7 @@ public class HttpController {
         Object redisData = redisTemplate.opsForValue().get("XiaoMiYunDong_"+phoneNumber);
         if (!Objects.isNull(redisData)){
             //根据手机号码删除信息
-            redisTemplate.delete("XiaoMiYunDong_"+phoneNumber);
+            //redisTemplate.delete("XiaoMiYunDong_"+phoneNumber);
         }
         if (flag){
             //表示多少秒过期，可以设置时间的计数单位，有分，小时，年，月，日等
