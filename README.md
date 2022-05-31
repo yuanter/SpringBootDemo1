@@ -80,12 +80,12 @@ http://ip:8080/mi?phoneNumber=手机号码&password=密码&steps=步数
 # 源码和curlSH.sh一起使用方式，定时打卡
 * 1、直接docker下载
 ```javascript
-docker pull yuanter/demo:latest
+docker pull yuanter/demo:2.0
 ```
 
 * 2、运行demo（#8080:8080中第一个8080是自定义映射端口，自己可以随意改，记得开放端口）
 ```javascript
-docker run -d --restart=always --name demo -p 8080:8080 yuanter/demo 
+docker run -d --restart=always --name demo -p 8080:8080 yuanter/demo:2.0
 ```
 
 * 3、查看启动日志
