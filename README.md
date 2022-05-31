@@ -40,16 +40,16 @@ http://ip:8080
 
 7、查看运行日志
 ```
-docker logs --tail  300 -f  jd_cookie
+docker logs --tail  300 -f  demo
 ```
 或者
 ```
-docker logs  jd_cookie
+docker logs  demo
 ```
 
 # 更新教程
 1、删除容器
-docker rm -f  jd_cookie
+docker rm -f  demo
 
 2、重新拉取镜像
 docker pull yuanter/demo
