@@ -4,10 +4,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import cn.yiidii.pigeon.common.core.base.R;
 import cn.yiidii.pigeon.common.core.exception.BizException;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Splitter;
 import com.wmg.Service.ExecService;
+import com.wmg.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -30,29 +32,55 @@ import java.util.stream.Collectors;
 @Service
 @SuppressWarnings("all")
 public class ExecServiceImpl implements ExecService {
+
+     String mobile = "";
+
     /**
      * @param phoneNumber
      * @param password
      * @param steps
      * @Description: 执行打卡业务
-     * @Param: phoneNumber, password, steps
      * @return:
      * @Author: wmg
      * @date: 2022/4/6 2:28
      */
     @Override
     public String exec(String phoneNumber, String password, Integer steps) throws Exception {
-        String accessCode = getAccessCode(phoneNumber, password);
+        mobile = phoneNumber;
+        String accessCode =  getAccessCode(phoneNumber, password);
         if (accessCode == null || accessCode.equals("")) {
-            throw new BizException("打卡失败，请检查账号密码是否正确");
+            throw new BizException(StrUtil.format("当前账号：{}，打卡失败，请检查账号密码是否正确",mobile));
         }
         Map<String, String> login = login(accessCode);
         String login_token = login.get("login_token");
         String user_id = login.get("user_id");
         String appToken = getAppToken(login_token);
         updateStep(appToken, user_id,steps);
-        System.out.println("当前账号："+phoneNumber+"打卡成功，步数为："+ steps);
+        System.out.println(StrUtil.format("当前账号：{}打卡成功，步数为：{}，打卡时间为：{}", phoneNumber,steps,TimeUtil.getOkDate(new Date().toString())));
         return "当前账号："+phoneNumber+"打卡成功，步数为："+ steps;
+    }
+
+    /**
+     * @param phoneNumber
+     * @param password
+     * @param steps
+     * @Description: 删除失效账号
+     * @return:
+     * @Author: wmg
+     * @date: 2022/6/9 1:10
+     */
+    @Override
+    public JSONObject check(String phoneNumber, String password) throws Exception {
+        JSONObject object = new JSONObject();
+        String accessCode =  getAccessCode(phoneNumber, password);
+        Map<String, String> login = login(accessCode);
+        String login_token = login.get("login_token");
+        String user_id = login.get("user_id");
+        String appToken = getAppToken(login_token);
+        object.put("accessCode",accessCode);
+        object.put("login",login);
+        object.put("appToken",appToken);
+        return object;
     }
 
 
@@ -88,9 +116,8 @@ public class ExecServiceImpl implements ExecService {
 //        log.info(s);
         return s;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new BizException(StrUtil.format("当前账号：{}，打卡失败，请稍后重试。。。异常为：{}",phoneNumber,e.getMessage()));
         }
-        return null;
     }
 
     /**
@@ -127,9 +154,8 @@ public class ExecServiceImpl implements ExecService {
 //            log.info(map.toString());
             return map;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new BizException(StrUtil.format("当前账号：{}，打卡失败，请稍后重试。。。",mobile));
         }
-        return null;
     }
 
     /**
@@ -154,9 +180,8 @@ public class ExecServiceImpl implements ExecService {
             String app_token = jsonObject.getJSONObject("token_info").getString("app_token");
             return app_token;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new BizException(StrUtil.format("当前账号：{}，打卡失败，请稍后重试。。。",mobile));
         }
-        return null;
     }
 
     /**
@@ -202,7 +227,7 @@ public class ExecServiceImpl implements ExecService {
         int code = object.getInteger("code");
         //{"code":-50000,"message":"Error parameter 'data_json'"}
         if (code != 1){
-            throw new BizException("程序出错，打卡失败");
+            throw new BizException(StrUtil.format("程序出错，当前账号：{}打卡失败",mobile));
         }
 
     }

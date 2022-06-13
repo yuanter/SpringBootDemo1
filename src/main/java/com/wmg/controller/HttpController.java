@@ -6,6 +6,7 @@ import cn.yiidii.pigeon.common.core.base.R;
 import cn.yiidii.pigeon.common.core.exception.BizException;
 import com.alibaba.fastjson.JSONObject;
 import com.wmg.Service.ExecService;
+import com.wmg.task.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,8 @@ public class HttpController {
     //注入redis
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private Task task;
 
     //是否启用定时打卡配置
     @Value("${demo.isSave}")
@@ -138,4 +141,58 @@ public class HttpController {
 
         return R.ok(result);
     }
+
+
+    @GetMapping("all")
+    public R allPush() throws InterruptedException {
+        task.process();
+        return R.ok();
+    }
+
+    @GetMapping("check")
+    public R check() throws Exception {
+        task.check();
+        return R.ok();
+    }
+    
+    /**
+    *@Description: 直接新增数据
+    *@Param: 
+    *@return: 
+    *@Author: wmg
+    *@date: 2022/6/13 14:26
+    */
+    @GetMapping("create")
+    public R createData(@RequestParam @NotNull(message = "手机号码为空，不允许访问") String phoneNumber, @RequestParam @NotNull(message = "密码为空，请检查") String password,@RequestParam(value="minSteps",required=false) Integer minSteps,@RequestParam(value="maxSteps",required=false) Integer maxSteps) throws Exception{
+        Assert.isTrue(PhoneUtil.isMobile(phoneNumber), () -> {
+            throw new BizException("手机号格式不正确");
+        });
+
+        //检查最小最大步数参数
+        if (!(minSteps instanceof Integer)){
+            throw new BizException("最小步数类型出错!");
+        }
+        if (minSteps < 1){
+            throw new BizException("最小步数不能小于1");
+        }
+        System.out.println("最小步数："+minSteps);
+
+        if (!(maxSteps instanceof Integer)){
+            throw new BizException("最大步数类型出错!");
+        }
+        if (maxSteps > 100000){
+            throw new BizException("最大步数不能大于100000");
+        }
+        System.out.println("最大步数："+maxSteps);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("phoneNumber",phoneNumber);
+        jsonObject.put("password",password);
+        jsonObject.put("minSteps",minSteps);
+        jsonObject.put("maxSteps",maxSteps);
+        //表示多少秒过期，可以设置时间的计数单位，有分，小时，年，月，日等
+        //redisTemplate.opsForValue().set("XiaoMiYunDong_"+phoneNumber, jsonObject, 600, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set("XiaoMiYunDong_"+phoneNumber, jsonObject.toString());
+        return R.ok();
+    }
+
 }
