@@ -36,7 +36,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Task implements SchedulingConfigurer {
 
     private final static Executor executor = Executors.newCachedThreadPool();//启用多线程
-    static int count = 0;
+    int count = 0;
 
     //定时表达式
     @Value("${demo.corn}")
@@ -74,6 +74,8 @@ public class Task implements SchedulingConfigurer {
     *@date: 2022/6/9 1:06
     */
     public void process() throws InterruptedException {
+        //将计数器归零
+        count = 0;
         Set<String> keys = redisTemplate.keys("XiaoMiYunDong_*");
         if (!Objects.isNull(keys)) {
             for (String str : keys) {
@@ -100,16 +102,13 @@ public class Task implements SchedulingConfigurer {
                         Integer maxSteps = responseJo.getInteger("maxSteps");
                         Integer steps = ThreadLocalRandom.current().nextInt(minSteps, maxSteps+1);
                         execService.exec(phoneNumber,password,steps);
-
-
-
                     }
                 }catch(Exception e){
                     System.out.println(StrUtil.format("当前账号：{}打卡失败，打卡时间为：{},异常为：{}", phoneNumber,TimeUtil.getOkDate(new Date().toString()),e.getMessage()));
                 }
                 if (count >= 30){
                     number=(int)(Math.random()*(10)+600);
-                    System.out.println("5分钟内打卡数达到30个，解黑休眠"+number+"秒，继续打卡");
+                    System.out.println("10分钟内打卡数达到30个，解黑休眠"+number+"秒，继续打卡");
                     Thread.sleep(number*1000);
                     count = 0;
                 }
@@ -127,26 +126,30 @@ public class Task implements SchedulingConfigurer {
     *@date: 2022/6/9 1:34
     */
     public void check() throws Exception {
+        //将计数器归零
+        count = 0;
         Set<String> keys = redisTemplate.keys("XiaoMiYunDong_*");
         if (!Objects.isNull(keys)) {
             for (String key : keys) {
+                count++;
                 //执行三次打卡,定时10秒一次，三次失效，删除
                 int flag = 0;
                 String phoneNumber = "";
                 String password = "";
-                String minSteps = "";
-                String maxSteps = "";
+                Integer minSteps = 1;
+                Integer maxSteps = 100000;
                 for (int i = 0; i < 3; i++){
                     try{
                         Object redisData = redisTemplate.opsForValue().get(key);
                         if (!Objects.isNull(redisData)){
                             JSONObject responseJo = JSONObject.parseObject(redisData.toString());
                             phoneNumber = responseJo.getString("phoneNumber");
-                            System.out.println(StrUtil.format("当前账号：{}，正在执行第{}次检测操作",phoneNumber,i));
+                            System.out.println(StrUtil.format("当前账号：{}，正在执行第{}次失效检测操作",phoneNumber,(i+1)));
                             password = responseJo.getString("password");
-                            minSteps = responseJo.getString("minSteps");
-                            maxSteps = responseJo.getString("maxSteps");
+                            minSteps = responseJo.getInteger("minSteps");
+                            maxSteps = responseJo.getInteger("maxSteps");
                             execService.check(phoneNumber, password);
+                            count++;
                         }else {
                             continue;
                         }
@@ -155,8 +158,8 @@ public class Task implements SchedulingConfigurer {
                         flag++;
                     }
 
-                    int number=(int)(Math.random()*(5-1)+5);
-                    System.out.println(StrUtil.format("随机休眠{}秒，继续执行检测操作",number));
+                    int number=(int)(Math.random()*(2)+1);
+                    System.out.println(StrUtil.format("随机休眠{}秒，继续执行失效检测操作",number));
                     Thread.sleep(number*1000);
                 }
                 if (flag == 3){
@@ -172,6 +175,12 @@ public class Task implements SchedulingConfigurer {
                     jsonObject.put("minSteps",minSteps);
                     jsonObject.put("maxSteps",maxSteps);
                     redisTemplate.opsForValue().set("XMYD_ShiXiao_"+phoneNumber, jsonObject.toString());
+                }
+                if (count >= 30){
+                    int number=(int)(Math.random()*(10)+600);
+                    System.out.println("10分钟内打卡数达到30个，解黑休眠"+number+"秒，继续打卡");
+                    Thread.sleep(number*1000);
+                    count = 0;
                 }
                 flag = 0;
             }
