@@ -13,6 +13,7 @@ import org.springframework.web.filter.CorsFilter;
  * @Description
  */
 @SpringBootConfiguration
+@SuppressWarnings("all")
 public class WebGlobalConfig {
 
     @Bean

@@ -16,7 +16,6 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -32,6 +31,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Configuration
 @Component//需要注册到bean中
 @Slf4j
+@SuppressWarnings("all")
 //所有的定时任务都放在一个线程池中，定时任务启动时使用不同都线程。
 public class Task implements SchedulingConfigurer {
 
@@ -131,7 +131,6 @@ public class Task implements SchedulingConfigurer {
         Set<String> keys = redisTemplate.keys("XiaoMiYunDong_*");
         if (!Objects.isNull(keys)) {
             for (String key : keys) {
-                count++;
                 //执行三次打卡,定时10秒一次，三次失效，删除
                 int flag = 0;
                 String phoneNumber = "";
@@ -142,6 +141,7 @@ public class Task implements SchedulingConfigurer {
                     try{
                         Object redisData = redisTemplate.opsForValue().get(key);
                         if (!Objects.isNull(redisData)){
+                            count++;
                             JSONObject responseJo = JSONObject.parseObject(redisData.toString());
                             phoneNumber = responseJo.getString("phoneNumber");
                             System.out.println(StrUtil.format("当前账号：{}，正在执行第{}次失效检测操作",phoneNumber,(i+1)));
@@ -149,7 +149,6 @@ public class Task implements SchedulingConfigurer {
                             minSteps = responseJo.getInteger("minSteps");
                             maxSteps = responseJo.getInteger("maxSteps");
                             execService.check(phoneNumber, password);
-                            count++;
                         }else {
                             continue;
                         }

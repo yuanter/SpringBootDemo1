@@ -1,7 +1,6 @@
 package com.wmg.controller;
 
 import cn.hutool.core.util.PhoneUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.yiidii.pigeon.common.core.base.R;
 import cn.yiidii.pigeon.common.core.exception.BizException;
 import com.alibaba.fastjson.JSONObject;
@@ -23,6 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @Slf4j
+@SuppressWarnings("all")
 public class HttpController {
 
 

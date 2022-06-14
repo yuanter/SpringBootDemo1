@@ -32,6 +32,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  * Description:
  */
+@SuppressWarnings("all")
 public class Http {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
