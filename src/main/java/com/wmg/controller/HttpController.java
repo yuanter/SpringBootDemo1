@@ -146,13 +146,13 @@ public class HttpController {
     @GetMapping("all")
     public R allPush() throws InterruptedException {
         task.process();
-        return R.ok();
+        return R.ok().setMsg("全部用户手动打卡成功");
     }
 
     @GetMapping("check")
     public R check() throws Exception {
         task.check();
-        return R.ok();
+        return R.ok().setMsg("全部用户是否账号失效检测成功");
     }
     
     /**

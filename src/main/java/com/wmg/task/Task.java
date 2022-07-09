@@ -5,6 +5,7 @@ import cn.yiidii.pigeon.common.core.exception.BizException;
 import com.alibaba.fastjson.JSONObject;
 import com.wmg.Service.ExecService;
 import com.wmg.util.TimeUtil;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +19,8 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Description: 多线程执行定时任务 官网：www.fhadmin.org
@@ -35,8 +35,12 @@ import java.util.concurrent.ThreadLocalRandom;
 //所有的定时任务都放在一个线程池中，定时任务启动时使用不同都线程。
 public class Task implements SchedulingConfigurer {
 
-    private final static Executor executor = Executors.newCachedThreadPool();//启用多线程
-    int count = 0;
+    //启用多线程
+    final ExecutorService  executor = Executors.newCachedThreadPool();
+    //AtomicInteger用来计数
+    AtomicInteger atomicInteger = new AtomicInteger(0);
+
+    volatile int count = 0;
 
     //定时表达式
     @Value("${demo.corn}")
@@ -74,45 +78,46 @@ public class Task implements SchedulingConfigurer {
     *@date: 2022/6/9 1:06
     */
     public void process() throws InterruptedException {
-        //将计数器归零
         count = 0;
         Set<String> keys = redisTemplate.keys("XiaoMiYunDong_*");
+
         if (!Objects.isNull(keys)) {
             for (String str : keys) {
+                count++;
                 //final int j=i; //关键是这一句代码，将 i 转化为  j，这样j 还是final类型的参与线程
                 final String key = str;
-                count++;
-                int number=(int)(Math.random()*(1)+1);
-                Thread.sleep(number*1000);
-//                executor.execute(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                    }
-//                });
-                String phoneNumber = "";
-                try{
-                    Object redisData = redisTemplate.opsForValue().get(key);
-                    //log.info("查询数据：{}",redisData);
-                    if (!Objects.isNull(redisData)){
-                        JSONObject responseJo = JSONObject.parseObject(redisData.toString());
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        String phoneNumber = "";
+                        try{
+                            Object redisData = redisTemplate.opsForValue().get(key);
+                            //log.info("查询数据：{}",redisData);
+                            if (!Objects.isNull(redisData)){
+                                JSONObject responseJo = JSONObject.parseObject(redisData.toString());
 //                                System.out.println(responseJo);
-                        phoneNumber = responseJo.getString("phoneNumber");
-                        String password = responseJo.getString("password");
-                        Integer minSteps = responseJo.getInteger("minSteps");
-                        Integer maxSteps = responseJo.getInteger("maxSteps");
-                        Integer steps = ThreadLocalRandom.current().nextInt(minSteps, maxSteps+1);
-                        execService.exec(phoneNumber,password,steps);
+                                phoneNumber = responseJo.getString("phoneNumber");
+                                String password = responseJo.getString("password");
+                                Integer minSteps = responseJo.getInteger("minSteps");
+                                Integer maxSteps = responseJo.getInteger("maxSteps");
+                                Integer steps = ThreadLocalRandom.current().nextInt(minSteps, maxSteps+1);
+                                execService.exec(phoneNumber,password,steps);
+//                                System.out.println("当前线程："+atomicInteger.incrementAndGet()+"正在执行任务");
+                            }
+                        }catch(Exception e){
+                            System.out.println(StrUtil.format("当前账号：{}打卡失败，打卡时间为：{},异常为：{}", phoneNumber,TimeUtil.getOkDate(new Date().toString()),e.getMessage()));
+                        }
                     }
-                }catch(Exception e){
-                    System.out.println(StrUtil.format("当前账号：{}打卡失败，打卡时间为：{},异常为：{}", phoneNumber,TimeUtil.getOkDate(new Date().toString()),e.getMessage()));
-                }
-                if (count >= 30){
-                    number=(int)(Math.random()*(10)+600);
-                    System.out.println("10分钟内打卡数达到30个，解黑休眠"+number+"秒，继续打卡");
+                });
+                if (count == 30){
+                    int number=(int)(Math.random()*(10)+600);
+                    System.out.println("10分钟内打卡数达到30个，等待解黑休眠时间"+number+"秒后继续打卡");
                     Thread.sleep(number*1000);
                     count = 0;
+//                    atomicInteger.set(0);
                 }
             }
+
         }
 
     }
@@ -137,9 +142,9 @@ public class Task implements SchedulingConfigurer {
                 String password = "";
                 Integer minSteps = 1;
                 Integer maxSteps = 100000;
+                Object redisData = redisTemplate.opsForValue().get(key);
                 for (int i = 0; i < 3; i++){
                     try{
-                        Object redisData = redisTemplate.opsForValue().get(key);
                         if (!Objects.isNull(redisData)){
                             count++;
                             JSONObject responseJo = JSONObject.parseObject(redisData.toString());
@@ -157,10 +162,11 @@ public class Task implements SchedulingConfigurer {
                         flag++;
                     }
 
-                    int number=(int)(Math.random()*(2)+1);
-                    System.out.println(StrUtil.format("随机休眠{}秒，继续执行失效检测操作",number));
-                    Thread.sleep(number*1000);
+//                    int number=(int)(Math.random()*(2)+1);
+//                    System.out.println(StrUtil.format("随机休眠{}秒，继续执行失效检测操作",number));
+//                    Thread.sleep(number*1000);
                 }
+
                 if (flag == 3){
                     System.out.println(StrUtil.format("当前账号：{}，已失效，执行删除操作",phoneNumber));
                     //移除失效账号
@@ -177,13 +183,15 @@ public class Task implements SchedulingConfigurer {
                 }
                 if (count >= 30){
                     int number=(int)(Math.random()*(10)+600);
-                    System.out.println("10分钟内打卡数达到30个，解黑休眠"+number+"秒，继续打卡");
+                    System.out.println("10分钟内打卡数达到30个，解黑休眠"+number+"秒，继续检测");
                     Thread.sleep(number*1000);
                     count = 0;
                 }
+                System.out.println();
                 flag = 0;
             }
         }
     }
+
 
 }
