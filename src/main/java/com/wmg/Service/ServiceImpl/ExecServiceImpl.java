@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("all")
 public class ExecServiceImpl implements ExecService {
 
-     String mobile = "";
+    String mobile = "";
 
     /**
      * @param phoneNumber
@@ -82,48 +82,48 @@ public class ExecServiceImpl implements ExecService {
 
 
     /**
-    *@Description: 获取登录头部参数
-    *@Param:
-    *@return:
-    *@Author: wmg
-    *@date: 2022/4/6 3:30
-    */
+     *@Description: 获取登录头部参数
+     *@Param:
+     *@return:
+     *@Author: wmg
+     *@date: 2022/4/6 3:30
+     */
     public String getAccessCode(String phoneNumber,String password)  throws Exception{
         try {
-        String url = StrUtil.format("https://api-user.huami.com/registrations/+86{}/tokens",phoneNumber);
-        HashMap<String, String> data = new HashMap<>();
-        data.put("client_id", "HuaMi");
-        data.put("password",password);
-        data.put("redirect_uri", "https://s3-us-west-2.amazonaws.com/hm-registration/successsignin.html");
-        data.put("token", "access");
-        String paramStr = CollUtil.join(data.entrySet().stream().map(e -> StrUtil.format("{}={}", e.getKey(), e.getValue())).collect(Collectors.toList()), "&");
-        String jmpUrl = StrUtil.format("{}?{}", url, paramStr);
-        HttpResponse response = HttpRequest.post(jmpUrl)
-                .header("User-Agent","MiFit/4.6.0 (iPhone; iOS 14.0.1; Scale/2.00)")
-                .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
-                .setConnectionTimeout(5000)
-                .execute();
+            String url = StrUtil.format("https://api-user.huami.com/registrations/+86{}/tokens",phoneNumber);
+            HashMap<String, String> data = new HashMap<>();
+            data.put("client_id", "HuaMi");
+            data.put("password",password);
+            data.put("redirect_uri", "https://s3-us-west-2.amazonaws.com/hm-registration/successsignin.html");
+            data.put("token", "access");
+            String paramStr = CollUtil.join(data.entrySet().stream().map(e -> StrUtil.format("{}={}", e.getKey(), e.getValue())).collect(Collectors.toList()), "&");
+            String jmpUrl = StrUtil.format("{}?{}", url, paramStr);
+            HttpResponse response = HttpRequest.post(jmpUrl)
+                    .header("User-Agent","MiFit/4.6.0 (iPhone; iOS 14.0.1; Scale/2.00)")
+                    .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+                    .setConnectionTimeout(5000)
+                    .execute();
 //        log.info("responseJo："+response.header("Location"));
 
-        //获取头部"Location"
-        String location = response.header("Location");
-        String params = location.substring(location.indexOf("?") + 1);
-        Map<String, String> split = Splitter.on("&").withKeyValueSeparator("=").split(params);
-        String s = split.get("access");
+            //获取头部"Location"
+            String location = response.header("Location");
+            String params = location.substring(location.indexOf("?") + 1);
+            Map<String, String> split = Splitter.on("&").withKeyValueSeparator("=").split(params);
+            String s = split.get("access");
 //        log.info(s);
-        return s;
+            return s;
         } catch (Exception e) {
             throw new BizException(StrUtil.format("当前账号：{}，打卡失败，请稍后重试。。。异常为：{}",phoneNumber,e.getMessage()));
         }
     }
 
     /**
-    *@Description: 登录获取token
-    *@Param:
-    *@return:
-    *@Author: wmg
-    *@date: 2022/4/6 3:29
-    */
+     *@Description: 登录获取token
+     *@Param:
+     *@return:
+     *@Author: wmg
+     *@date: 2022/4/6 3:29
+     */
     public Map<String, String> login(String accessCode) {
         try {
             HashMap<String, String> data1 = new HashMap<>();
@@ -156,12 +156,12 @@ public class ExecServiceImpl implements ExecService {
     }
 
     /**
-    *@Description: 获取app的token
-    *@Param:
-    *@return:
-    *@Author: wmg
-    *@date: 2022/4/6 3:15
-    */
+     *@Description: 获取app的token
+     *@Param:
+     *@return:
+     *@Author: wmg
+     *@date: 2022/4/6 3:15
+     */
     public String getAppToken(String login_token) {
         try {
             if (login_token == null || login_token.equals("")) {
@@ -182,12 +182,12 @@ public class ExecServiceImpl implements ExecService {
     }
 
     /**
-    *@Description: 更新步数
-    *@Param:
-    *@return:
-    *@Author: wmg
-    *@date: 2022/4/6 3:20
-    */
+     *@Description: 更新步数
+     *@Param:
+     *@return:
+     *@Author: wmg
+     *@date: 2022/4/6 3:20
+     */
     public void updateStep(String appToken, String userId, Integer step) {
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");

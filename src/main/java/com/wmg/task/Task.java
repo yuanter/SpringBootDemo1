@@ -1,11 +1,13 @@
 package com.wmg.task;
 
+import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.yiidii.pigeon.common.core.exception.BizException;
 import com.alibaba.fastjson.JSONObject;
 import com.wmg.Service.ExecService;
+import com.wmg.Service.NewExecService;
+import com.wmg.util.EmailUtil;
 import com.wmg.util.TimeUtil;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,6 +48,8 @@ public class Task implements SchedulingConfigurer {
     @Value("${demo.corn}")
     private String corn;
     @Autowired
+    private NewExecService newExecService;
+    @Autowired
     private ExecService execService;
     //注入redis
     @Autowired
@@ -80,8 +84,7 @@ public class Task implements SchedulingConfigurer {
     public void process() throws InterruptedException {
         count = 0;
         Set<String> keys = redisTemplate.keys("XiaoMiYunDong_*");
-
-        if (!Objects.isNull(keys)) {
+        if (keys.size()>0) {
             for (String str : keys) {
                 count++;
                 //final int j=i; //关键是这一句代码，将 i 转化为  j，这样j 还是final类型的参与线程
@@ -101,7 +104,13 @@ public class Task implements SchedulingConfigurer {
                                 Integer minSteps = responseJo.getInteger("minSteps");
                                 Integer maxSteps = responseJo.getInteger("maxSteps");
                                 Integer steps = ThreadLocalRandom.current().nextInt(minSteps, maxSteps+1);
-                                execService.exec(phoneNumber,password,steps);
+                                //因不清楚手机打卡失败的原因，故调用两个不同方法
+                                if (PhoneUtil.isMobile(phoneNumber)){
+                                    execService.exec(phoneNumber,password,steps);
+                                }else {
+                                    newExecService.exec(phoneNumber,password,steps);
+                                }
+
 //                                System.out.println("当前线程："+atomicInteger.incrementAndGet()+"正在执行任务");
                             }
                         }catch(Exception e){
@@ -134,7 +143,7 @@ public class Task implements SchedulingConfigurer {
         //将计数器归零
         count = 0;
         Set<String> keys = redisTemplate.keys("XiaoMiYunDong_*");
-        if (!Objects.isNull(keys)) {
+        if (keys.size() > 0) {
             for (String key : keys) {
                 //执行三次打卡,定时10秒一次，三次失效，删除
                 int flag = 0;
@@ -153,7 +162,12 @@ public class Task implements SchedulingConfigurer {
                             password = responseJo.getString("password");
                             minSteps = responseJo.getInteger("minSteps");
                             maxSteps = responseJo.getInteger("maxSteps");
-                            execService.check(phoneNumber, password);
+                            if (PhoneUtil.isMobile(phoneNumber)){
+                                execService.check(phoneNumber, password);
+                            }else {
+                                newExecService.check(phoneNumber, password);
+                            }
+
                         }else {
                             continue;
                         }
