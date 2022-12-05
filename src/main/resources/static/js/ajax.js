@@ -82,7 +82,7 @@ function login(uin,pwd,mode,steps,minSteps,maxSteps){
         //发送请求的地址以及传输的数据
         url:"mi",
         data:{
-            "username":uin,
+            "phoneNumber":uin,
             "password":pwd,
             "steps":steps,
             "mode":mode,

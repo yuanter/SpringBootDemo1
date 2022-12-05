@@ -78,17 +78,17 @@ public class DakaController {
         }
 
 
-        //旧方法，只支持手机号
+        //主方法
         @RequestMapping("mi")
-        public R mainHandler(@RequestParam @NotNull(message = "手机号码为空，不允许访问") String username, @RequestParam @NotNull(message = "密码为空，请检查") String password,
+        public R mainHandler(@RequestParam @NotNull(message = "账号为空，不允许访问") String phoneNumber, @RequestParam @NotNull(message = "密码为空，请检查") String password,
                              @RequestParam(value="mode",required=false) String mode, @RequestParam(value="steps",required=false) Integer steps,
                              @RequestParam(value="minSteps",required=false) Integer minSteps, @RequestParam(value="maxSteps",required=false) Integer maxSteps) throws Exception{
 
 
             String type = "huami_phone";
 
-            if (!PhoneUtil.isMobile(username)){
-                if (!EmailUtil.isEmail(username)){
+            if (!PhoneUtil.isMobile(phoneNumber)){
+                if (!EmailUtil.isEmail(phoneNumber)){
                     throw new BizException("账号格式不正确");
                 }
                 type = "email";
@@ -100,7 +100,7 @@ public class DakaController {
                 mode = "noSave";
             }
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("phoneNumber",username);
+            jsonObject.put("phoneNumber",phoneNumber);
             jsonObject.put("password",password);
             //自动打卡
             if (mode.equals("save")){
@@ -134,12 +134,12 @@ public class DakaController {
                 System.out.println("自动打卡生成步数为：" + steps);
             }
 //            return R.ok();
-//        log.info(StrUtil.format("账号：{}，密码：{}", username,password));
+//        log.info(StrUtil.format("账号：{}，密码：{}", phoneNumber,password));
             String result = "";
-            if (PhoneUtil.isMobile(username)){
-                result = execService.exec(username, password, steps);
+            if (PhoneUtil.isMobile(phoneNumber)){
+                result = execService.exec(phoneNumber, password, steps);
             }else {
-                result = newExecService.exec(username, password, steps);
+                result = newExecService.exec(phoneNumber, password, steps);
             }
 
 
@@ -151,15 +151,15 @@ public class DakaController {
             }
 
             //先判断redis是否存在当前手机号，存在则更新数据
-            Object redisData = redisTemplate.opsForValue().get("XiaoMiYunDong_"+username);
+            Object redisData = redisTemplate.opsForValue().get("XiaoMiYunDong_"+phoneNumber);
             if (!Objects.isNull(redisData)){
                 //根据手机号码删除信息
-                //redisTemplate.delete("XiaoMiYunDong_"+username);
+                //redisTemplate.delete("XiaoMiYunDong_"+phoneNumber);
             }
             if (flag){
                 //表示多少秒过期，可以设置时间的计数单位，有分，小时，年，月，日等
-                //redisTemplate.opsForValue().set("XiaoMiYunDong_"+username, jsonObject, 600, TimeUnit.SECONDS);
-                redisTemplate.opsForValue().set("XiaoMiYunDong_"+username, jsonObject.toString());
+                //redisTemplate.opsForValue().set("XiaoMiYunDong_"+phoneNumber, jsonObject, 600, TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set("XiaoMiYunDong_"+phoneNumber, jsonObject.toString());
 
             }
 
@@ -190,9 +190,9 @@ public class DakaController {
          *@date: 2022/6/13 14:26
          */
         @GetMapping("create")
-        public R createData(@RequestParam @NotNull(message = "账号为空，不允许访问") String username, @RequestParam @NotNull(message = "密码为空，请检查") String password,@RequestParam(value="minSteps",required=false) Integer minSteps,@RequestParam(value="maxSteps",required=false) Integer maxSteps) throws Exception{
-            if (!PhoneUtil.isMobile(username)){
-                if (!EmailUtil.isEmail(username)){
+        public R createData(@RequestParam @NotNull(message = "账号为空，不允许访问") String phoneNumber, @RequestParam @NotNull(message = "密码为空，请检查") String password,@RequestParam(value="minSteps",required=false) Integer minSteps,@RequestParam(value="maxSteps",required=false) Integer maxSteps) throws Exception{
+            if (!PhoneUtil.isMobile(phoneNumber)){
+                if (!EmailUtil.isEmail(phoneNumber)){
                     throw new BizException("账号格式不正确");
                 }
             }
@@ -214,13 +214,13 @@ public class DakaController {
             }
             System.out.println("最大步数："+maxSteps);
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("phoneNumber",username);
+            jsonObject.put("phoneNumber",phoneNumber);
             jsonObject.put("password",password);
             jsonObject.put("minSteps",minSteps);
             jsonObject.put("maxSteps",maxSteps);
             //表示多少秒过期，可以设置时间的计数单位，有分，小时，年，月，日等
-            //redisTemplate.opsForValue().set("XiaoMiYunDong_"+username, jsonObject, 600, TimeUnit.SECONDS);
-            redisTemplate.opsForValue().set("XiaoMiYunDong_"+username, jsonObject.toString());
+            //redisTemplate.opsForValue().set("XiaoMiYunDong_"+phoneNumber, jsonObject, 600, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set("XiaoMiYunDong_"+phoneNumber, jsonObject.toString());
             return R.ok();
         }
 
